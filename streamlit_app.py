@@ -2,141 +2,268 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
-import os
 
-# ==========================================
-# KONFIGURASI HALAMAN
-# ==========================================
+# =========================
+# PAGE CONFIG
+# =========================
 st.set_page_config(
-    page_title="House Price Prediction",
+    page_title="Prediksi Harga Rumah",
     page_icon="🏠",
-    layout="centered"
+    layout="wide"
 )
 
-# ==========================================
-# LOAD MODEL DAN FEATURE NAMES
-# ==========================================
-BASE_PATH = os.path.dirname(__file__)
+# =========================
+# LOAD MODEL
+# =========================
+MODEL_PATH = "house_price_xgboost.pkl"
+FEATURE_PATH = "feature_names.pkl"
 
-MODEL_PATH = os.path.join(BASE_PATH, "house_price_xgboost.pkl")
-FEATURE_PATH = os.path.join(BASE_PATH, "feature_names.pkl")
-
-# Load model
 model = joblib.load(MODEL_PATH)
-
-# Load nama fitur
 feature_names = joblib.load(FEATURE_PATH)
 
-# ==========================================
+# =========================
+# CUSTOM CSS
+# =========================
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+}
+
+.stApp {
+    background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+}
+
+.hero {
+    background: linear-gradient(135deg, #0f172a, #1e3a8a);
+    padding: 3rem;
+    border-radius: 28px;
+    color: white;
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+    margin-bottom: 2rem;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.hero p {
+    font-size: 1.1rem;
+    color: #cbd5e1;
+}
+
+.metric-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 22px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.result-box {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 2.5rem;
+    border-radius: 24px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(16, 185, 129, 0.25);
+}
+
+.result-title {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    margin-bottom: 0.5rem;
+}
+
+.result-price {
+    font-size: 2.7rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.sidebar-note {
+    background: #eff6ff;
+    padding: 1rem;
+    border-radius: 14px;
+    border: 1px solid #bfdbfe;
+    font-size: 0.9rem;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# =========================
 # HEADER
-# ==========================================
-st.title("House Price Prediction")
-st.write(
-    """
-    Aplikasi ini memprediksi harga rumah menggunakan model XGBoost.
-    Masukkan karakteristik rumah di bawah ini, lalu klik tombol **Predict Price**.
-    """
-)
+# =========================
+st.markdown("""
+<div class="hero">
+    <h1>Prediksi Harga Rumah</h1>
+    <p>
+        Dashboard machine learning dengan menggunakan <b>XGBoost</b>
+        untuk memprediksi harga rumah berdasarkan 5 fitur utama.
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
-# ==========================================
-# INPUT USER
-# ==========================================
-st.subheader("Input Karakteristik Rumah")
+# =========================
+# SIDEBAR INPUT
+# =========================
+with st.sidebar:
+    st.header("📝 Input Karakteristik Rumah")
 
-overall_qual = st.slider(
-    "Overall Quality (1 = Sangat Buruk, 10 = Sangat Baik)",
-    min_value=1,
-    max_value=10,
-    value=5
-)
+    st.markdown("""
+    <div class="sidebar-note">
+        Masukkan spesifikasi rumah, lalu klik tombol prediksi untuk
+        memperoleh estimasi harga dalam USD dan Rupiah.
+    </div>
+    """, unsafe_allow_html=True)
 
-gr_liv_area = st.number_input(
-    "Luas Tanah (sq ft)",
-    min_value=500,
-    max_value=6000,
-    value=1500
-)
+    overall_qual = st.slider(
+        "⭐ Kualitas Rumah",
+        min_value=1,
+        max_value=10,
+        value=7
+    )
 
-garage_cars = st.slider(
-    "Kapasitas Muatan Garasi Mobil",
-    min_value=0,
-    max_value=5,
-    value=1
-)
+    gr_liv_area = st.number_input(
+        "📐 Luas Rumah (sq ft)",
+        min_value=100,
+        value=2000,
+        step=100
+    )
 
-total_bsmt_sf = st.number_input(
-    "Total Luas Area Bawah Tanah (sq ft)",
-    min_value=0,
-    max_value=3000,
-    value=800
-)
+    garage_cars = st.slider(
+        "🚗 Kapasitas Garasi",
+        min_value=0,
+        max_value=12,
+        value=2
+    )
 
-year_built = st.number_input(
-    "Tahun Bangunan",
-    min_value=1870,
-    max_value=2026,
-    value=2000
-)
+    total_bsmt_sf = st.number_input(
+        "🏗️ Luas Basement (sq ft)",
+        min_value=0,
+        value=800,
+        step=50
+    )
 
-# ==========================================
+    year_built = st.number_input(
+        "📅 Tahun Dibangun",
+        min_value=1900,
+        max_value=2025,
+        value=2000
+    )
+
+    predict_button = st.button(
+        "🔮 Prediksi Harga Rumah",
+        use_container_width=True
+    )
+
+# =========================
+# MAIN CONTENT
+# =========================
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown("""
+    <div class="metric-card">
+        <h4>🤖 Model</h4>
+        <h2>XGBoost</h2>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown("""
+    <div class="metric-card">
+        <h4>📊 Jumlah Fitur</h4>
+        <h2>5 Fitur</h2>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col3:
+    st.markdown("""
+    <div class="metric-card">
+        <h4>💱 Kurs USD/IDR</h4>
+        <h2>17.500</h2>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# =========================
 # PREDIKSI
-# ==========================================
-if st.button("Predict Price"):
+# =========================
+if predict_button:
 
-    # Buat dataframe kosong sesuai seluruh fitur model
+    # DataFrame kosong sesuai fitur model
     X_input = pd.DataFrame(
         np.zeros((1, len(feature_names))),
         columns=feature_names
     )
 
-    # Isi fitur yang tersedia dari input user
-    input_features = {
-        "OverallQual": overall_qual,
-        "GrLivArea": gr_liv_area,
-        "GarageCars": garage_cars,
-        "TotalBsmtSF": total_bsmt_sf,
-        "YearBuilt": year_built
-    }
+    # Isi 5 fitur utama
+    X_input["OverallQual"] = overall_qual
+    X_input["GrLivArea"] = gr_liv_area
+    X_input["GarageCars"] = garage_cars
+    X_input["TotalBsmtSF"] = total_bsmt_sf
+    X_input["YearBuilt"] = year_built
 
-    for feature, value in input_features.items():
-        if feature in X_input.columns:
-            X_input.loc[0, feature] = value
-
-    # Prediksi (hasil model masih dalam log scale)
+    # Prediksi (target sebelumnya menggunakan log1p)
     pred_log = model.predict(X_input)[0]
 
-    # Ubah kembali ke harga asli (USD)
-    predicted_price = model.predict(X_input)[0]
+    # Batasi nilai prediksi log agar tidak overflow
+    pred_log = np.clip(pred_log, 0, 20)
 
-    # Konversi USD ke Rupiah
-    usd_to_idr = 16500
+    # Konversi kembali ke harga asli
+    predicted_price = np.expm1(pred_log)
+
+    # Konversi ke Rupiah
+    usd_to_idr = 17500
     predicted_price_idr = predicted_price * usd_to_idr
 
-    # ==========================================
-    # TAMPILKAN HASIL
-    # ==========================================
-    # Konversi USD ke Rupiah (kurs asumsi Rp16.500 per USD)
-    usd_to_idr = 16500
-    predicted_price_idr = predicted_price * usd_to_idr
+    # Hasil prediksi
+    st.markdown(f"""
+    <div class="result-box">
+        <div class="result-title">💰 Estimasi Harga Rumah</div>
+        <div class="result-price">
+            Rp {predicted_price_idr:,.0f}
+        </div>
+        <div style="margin-top: 12px; font-size: 1.1rem;">
+            ≈ USD {predicted_price:,.2f}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    # Tampilkan hasil dalam USD dan Rupiah
-    st.success(f"Dollar Estimated House Price (USD): ${predicted_price:,.2f}")
-    st.success(f"Rupiah Estimated House Price (IDR): Rp {predicted_price_idr:,.0f}")
+    st.markdown("## 📋 Detail Input")
 
-    st.subheader("📊 Detail Input")
-    st.write({
-        "Overall Quality": overall_qual,
-        "Living Area (sq ft)": gr_liv_area,
-        "Garage Capacity": garage_cars,
-        "Basement Area (sq ft)": total_bsmt_sf,
-        "Year Built": year_built
+    detail_df = pd.DataFrame({
+        "Fitur": [
+            "Kualitas Rumah",
+            "Luas Rumah",
+            "Kapasitas Garasi",
+            "Luas Basement",
+            "Tahun Dibangun"
+        ],
+        "Nilai": [
+            overall_qual,
+            f"{gr_liv_area:,} sq ft",
+            garage_cars,
+            f"{total_bsmt_sf:,} sq ft",
+            year_built
+        ]
     })
 
-# ==========================================
+    st.dataframe(detail_df, use_container_width=True)
+
+else:
+    st.info("👈 Masukkan data rumah pada sidebar, lalu klik **Prediksi Harga Rumah**.")
+
+# =========================
 # FOOTER
-# ==========================================
+# =========================
 st.markdown("---")
 st.caption(
-    "Model: XGBoost Regressor | Dataset: Kaggle House Prices | "
-    "R² Score ≈ 0.9057"
+    "Dibuat menggunakan Python, XGBoost, dan Streamlit • Dataset: Kaggle House Prices"
 )
