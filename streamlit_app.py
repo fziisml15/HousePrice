@@ -106,7 +106,7 @@ if st.button("🔮 Predict Price"):
     pred_log = model.predict(X_input)[0]
 
     # Ubah kembali ke harga asli (USD)
-    predicted_price = np.expm1(pred_log)
+    predicted_price = model.predict(X_input)[0]
 
     # Konversi USD ke Rupiah
     usd_to_idr = 16500
