@@ -102,11 +102,14 @@ if st.button("🔮 Predict Price"):
         if feature in X_input.columns:
             X_input.loc[0, feature] = value
 
-    # Prediksi harga rumah
-    predicted_price = model.predict(X_input)[0]
+    # Prediksi (hasil model masih dalam log scale)
+    pred_log = model.predict(X_input)[0]
+
+    # Ubah kembali ke harga asli (USD)
+    predicted_price = np.expm1(pred_log)
 
     # Konversi USD ke Rupiah
-    usd_to_idr = 17500
+    usd_to_idr = 16500
     predicted_price_idr = predicted_price * usd_to_idr
 
     # ==========================================
