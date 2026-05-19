@@ -30,7 +30,7 @@ feature_names = joblib.load(FEATURE_PATH)
 # ==========================================
 # HEADER
 # ==========================================
-st.title("🏠 House Price Prediction")
+st.title("House Price Prediction")
 st.write(
     """
     Aplikasi ini memprediksi harga rumah menggunakan model XGBoost.
@@ -41,7 +41,7 @@ st.write(
 # ==========================================
 # INPUT USER
 # ==========================================
-st.subheader("📋 Input Karakteristik Rumah")
+st.subheader("Input Karakteristik Rumah")
 
 overall_qual = st.slider(
     "Overall Quality (1 = Sangat Buruk, 10 = Sangat Baik)",
@@ -51,37 +51,35 @@ overall_qual = st.slider(
 )
 
 gr_liv_area = st.number_input(
-    "Ground Living Area (sq ft)",
+    "Luas Tanah (sq ft)",
     min_value=500,
-    max_value=5000,
     value=1500
 )
 
 garage_cars = st.slider(
-    "Garage Capacity (Jumlah Mobil)",
+    "Kapasitas Muatan Garasi",
     min_value=0,
-    max_value=5,
-    value=2
+    max_value=200,
+    value=1
 )
 
 total_bsmt_sf = st.number_input(
-    "Total Basement Area (sq ft)",
+    "Total Luas Area Bawah Tanah (sq ft)",
     min_value=0,
-    max_value=3000,
     value=800
 )
 
 year_built = st.number_input(
-    "Year Built",
-    min_value=1900,
-    max_value=2025,
+    "Tahun Bangunan",
+    min_value=1700,
+    max_value=2100,
     value=2000
 )
 
 # ==========================================
 # PREDIKSI
 # ==========================================
-if st.button("🔮 Predict Price"):
+if st.button("Predict Price"):
 
     # Buat dataframe kosong sesuai seluruh fitur model
     X_input = pd.DataFrame(
