@@ -53,26 +53,28 @@ overall_qual = st.slider(
 gr_liv_area = st.number_input(
     "Luas Tanah (sq ft)",
     min_value=500,
+    max_value=6000,
     value=1500
 )
 
 garage_cars = st.slider(
-    "Kapasitas Muatan Garasi",
+    "Kapasitas Muatan Garasi Mobil",
     min_value=0,
-    max_value=200,
+    max_value=5,
     value=1
 )
 
 total_bsmt_sf = st.number_input(
     "Total Luas Area Bawah Tanah (sq ft)",
     min_value=0,
+    max_value=3000,
     value=800
 )
 
 year_built = st.number_input(
     "Tahun Bangunan",
-    min_value=1700,
-    max_value=2100,
+    min_value=1870,
+    max_value=2026,
     value=2000
 )
 
