@@ -213,10 +213,11 @@ if predict_button:
     # Prediksi model (hasil dalam skala log)
     pred_log = model.predict(X_input)[0]
 
-    # Batasi log prediction agar tetap realistis
-    pred_log = np.clip(pred_log, 10, 14)
+    if pred_log > 20:
+        pred_log = 20
+    elif pred_log < 8:
+        pred_log = 8
 
-    # Konversi kembali ke harga asli
     predicted_price = np.expm1(pred_log)
 
     # Konversi ke Rupiah
