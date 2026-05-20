@@ -210,14 +210,14 @@ if predict_button:
     X_input["TotalBsmtSF"] = total_bsmt_sf
     X_input["YearBuilt"] = year_built
 
-    # Prediksi (target sebelumnya menggunakan log1p)
     pred_log = model.predict(X_input)[0]
 
-    # Batasi nilai prediksi log agar tidak overflow
-    pred_log = np.clip(pred_log, 0, 20)
-
-    # Konversi kembali ke harga asli
+    # Konversi dari log ke harga asli
     predicted_price = np.expm1(pred_log)
+
+    # Jika hasil tidak valid (inf atau NaN), gunakan batas maksimum realistis
+    if not np.isfinite(predicted_price):
+        predicted_price = 3_000_000  # USD maksimum realistis (~ Rp 52,5 miliar)
 
     # Konversi ke Rupiah
     usd_to_idr = 17500
