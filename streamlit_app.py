@@ -212,12 +212,11 @@ if predict_button:
 
     pred_log = model.predict(X_input)[0]
 
-    # Konversi dari log ke harga asli
-    predicted_price = np.expm1(pred_log)
+    # Batasi log prediction ke rentang realistis
+    pred_log = np.clip(pred_log, 10, 14)
 
-    # Jika hasil tidak valid (inf atau NaN), gunakan batas maksimum realistis
-    if not np.isfinite(predicted_price):
-        predicted_price = 3_000_000  # USD maksimum realistis (~ Rp 52,5 miliar)
+    # Ubah kembali ke harga asli
+    predicted_price = np.expm1(pred_log)
 
     # Konversi ke Rupiah
     usd_to_idr = 17500
