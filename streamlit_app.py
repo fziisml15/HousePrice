@@ -210,13 +210,12 @@ if predict_button:
     X_input["TotalBsmtSF"] = total_bsmt_sf
     X_input["YearBuilt"] = year_built
 
+    # prediksi
     pred_log = model.predict(X_input)[0]
-
-    # Batasi log prediction ke rentang realistis
-    pred_log = np.clip(pred_log, 10, 14)
-
-    # Ubah kembali ke harga asli
     predicted_price = np.expm1(pred_log)
+
+    if not np.isfinite(predicted_price):
+        predicted_price = 1_000_000
 
     # Konversi ke Rupiah
     usd_to_idr = 17500
